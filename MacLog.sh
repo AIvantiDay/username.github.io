@@ -1,9 +1,12 @@
 #!/bin/bash
 
-if [ $EUID != 0 ]; then
-    echo This Script requires elevated privileges
-    sudo "$0" "$@"
-    exit $?
+if [ $EUID != 0 ]; 
+    then
+        echo This Script requires elevated privileges
+        sudo "$0" "$@"
+        exit $?
+    else
+    :
 fi
 
 #Find out how far back we want to go for logging
