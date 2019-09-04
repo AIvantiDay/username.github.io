@@ -36,7 +36,7 @@ TEMP_FILE="/Library/Application Support/LANDesk/TEMP.log"
 input="/Library/Application Support/LANDesk/Unfiltered.log"
 TotalCount=$(wc -l < "/Library/Application Support/LANDesk/Unfiltered.log")
 
-#This loop will strip out the component logging that we care about based on the user response. Also will echo percentage done for user feedback
+#This loop will strip out the component logging that we care about based on the user response
 while read line; do
     counter=$((counter +1))
     PercentageDone=$((100*counter/TotalCount))
@@ -107,10 +107,12 @@ while read line; do
         fi
 done < "$input"
 
-#Ask the user if they want ProxyHost Traffic as well for Web Traffic Logging
+
 echo "Finished filtering $varname logs"
 echo
 sleep 1
+
+#Ask the user if they want ProxyHost Traffic as well for Web Traffic Logging
 echo -e "Should we get ProxyHost Logging too? (Web Traffic to and from Core) (y/n)"
 
 read proxyname
@@ -118,7 +120,7 @@ read proxyname
 if [[ $proxyname = "y" ]];
     then
         input="/Library/Application Support/LANDesk/Unfiltered.log"
-        PROXY_FILE="/Library/Application Support/LANDesk/proxyhost.log"
+        PROXY_FILE="/Library/Application Support/LANDesk/proxyhosttemp.log"
         while read line; do
             counter3=$((counter3 +1))
             PercentageDone=$((100*counter3/TotalCount))
@@ -139,7 +141,7 @@ echo
 echo Done Filtering
 sleep 2
 
-#This loop will strip out "superflous" stuff no one cares about. Also will echo percentage done for user feedback.
+#This loop will strip out "superflous" stuff we don't need from the Component log
 input="$TEMP_FILE"
 FINAL_OUTPUT="/Library/Application Support/LANDesk/$varname.log"
 TotalCount=$(wc -l < "/Library/Application Support/LANDesk/TEMP.log")
@@ -156,6 +158,30 @@ while read line; do
         fi
 done < "$input"
 
+echo 
+
+#This loop will strip out "superflous" stuff we don't need from the ProxyHost Log (If the User said Yes)
+if [[ $proxyname = "y" ]];
+    then
+        input="$PROXY_FILE"
+        FINAL_PROXY="/Library/Application Support/LANDesk/ProxyHost.log"
+        TotalCount=$(wc -l < "/Library/Application Support/LANDesk/proxyhosttemp.log")      
+        while read line; do
+            counter4=$((counter4 +1))
+            PercentageDone=$((100*counter4/TotalCount))
+            echo -ne " Cleaning ProxyHost log...$PercentageDone%"\\r
+                if [[ $line =~ libnetwork.dylib ]] || [[ $line =~ CFNetwork ]] || [[ $line =~ com.apple.network ]] || [[ $line =~ libsystem_info.dylib ]] || [[ $line =~ CoreFoundation ]] || [[ $line =~ userclean.xml ]];
+                then
+                    :
+                else
+                echo $line >> "$FINAL_PROXY"
+                fi
+        done < "$input"
+    else
+        :
+fi
+
+
 echo
 echo Done Cleaning
 echo
@@ -166,9 +192,9 @@ if [ -f "$FINAL_OUTPUT" ]; #check if the final log actually exists. There may ha
         if [[ $proxyname = "y" ]]; #do this if the user said "yes" to ProxyHost
           then
             cp "$FINAL_OUTPUT" ~/Desktop #Copy file to Desktop to grab easily
-            cp "$PROXY_FILE" ~/Desktop
+            cp "$FINAL_PROXY" ~/Desktop
             cp "/Library/Application Support/LANDesk/Unfiltered.log" ~/Desktop #Copy original unfiltered log in case comparison is needed
-            echo "All Done - The requested log file "$varname.log," proxyhost.log, and the unfiltered log are on the Desktop"
+            echo "All Done - The requested log files "$varname.log," proxyhost.log, and the Unfiltered.log are on the Desktop"
             
             rm "$TEMP_FILE" #Delete the other files created since we have to append stuff and we don't want the same logging over again
             rm "$FINAL_OUTPUT"
@@ -177,7 +203,7 @@ if [ -f "$FINAL_OUTPUT" ]; #check if the final log actually exists. There may ha
           then
             cp "$FINAL_OUTPUT" ~/Desktop #Copy file to Desktop to grab easily
             cp "/Library/Application Support/LANDesk/Unfiltered.log" ~/Desktop #Copy original unfiltered log in case comparison is needed
-            echo "All Done - The requested log file "$varname.log" as well as the unfiltered log are on the Desktop"
+            echo "All Done - The requested log files "$varname.log" as well as the Unfiltered.log are on the Desktop"
             rm "$TEMP_FILE" #Delete the other files created since we have to append stuff and we don't want the same logging over again
             rm "$FINAL_OUTPUT"
         fi
