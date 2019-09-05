@@ -1,5 +1,8 @@
 #!/bin/bash
 
+RED=`tput setaf 1`
+NOCOLOR=`tput sgr0`
+
 if [ $EUID != 0 ]; 
     then
         echo This Script requires elevated privileges
@@ -11,17 +14,17 @@ fi
 
 #Find out how far back we want to go for logging
 
-echo This script will gather Ivanti Agent Logging from the Apple Unified Logging Database
+echo "${RED}This script will gather Ivanti Agent Logging from the Apple Unified Logging Database"
 
-echo How many hours should we look back for logs?
+echo "How many hours should we look back for logs?${NOCOLOR}"
 
-read varname
+read time
 
 #Gather Logging from the Unified Logging System according to requested timeframe and pipe it to file
 
-echo Gathering...
+echo "${RED}Gathering..."
 
-log show --predicate 'processImagePath contains "LANDesk"' --debug --info --last "${varname}h" > "/Library/Application Support/LANDesk/Unfiltered.log"
+log show --predicate 'processImagePath contains "LANDesk"' --debug --info --last "${time}h" > "/Library/Application Support/LANDesk/Unfiltered.log"
 
 echo "Enter one of the Following Components to filter (CASE SENSITVE):
      Patch
@@ -90,6 +93,16 @@ while read line; do
             if [[ $line =~ ldinstallprofile ]] || [[ $line =~ ldapm ]] || [[ $line =~ ldagentsettings ]];
             then 
                 echo $line >> "$TEMP_FILE"
+                if [[ $line =~ "deferring to MDM to manage profiles" ]];
+                    then
+                        #If we're looking at profiles and MDM is enrolled, we'll break the loop here and get MDM logging instead
+                        echo "It looks like this device is enrolled in MDM, which handles profile installation. We'll get logs from MDM as well"
+                        MDMEnrolled=y
+                        sleep 3
+                        break
+                else
+                    :
+                fi
             else 
                 :
             fi
@@ -110,6 +123,15 @@ while read line; do
         fi
 done < "$input"
 
+#If we're looking at Profile logging and found that MDM was enrolled, we have to get some different logging and append it to the TEMP Log
+if [[ $MDMEnrolled = "y" ]];
+    then
+        echo
+        echo Getting MDM Logs...
+        log show --predicate 'processImagePath contains "mdm"' --debug --info --last "${time}h" >> "/Library/Application Support/LANDesk/TEMP.log"
+    else
+    :
+fi
 
 echo "Finished filtering $varname logs"
 echo
@@ -136,6 +158,7 @@ if [[ $proxyname = "y" ]];
                 fi
         done <"$input"
     else
+        echo
         echo OK
         sleep 1
 fi
@@ -152,8 +175,9 @@ TotalCount=$(wc -l < "/Library/Application Support/LANDesk/TEMP.log")
 while read line; do
     counter2=$((counter2 +1))
     PercentageDone=$((100*counter2/TotalCount))
+    echo
     echo -ne " Cleaning $varname log...$PercentageDone%"\\r
-        if [[ $line =~ libnetwork.dylib ]] || [[ $line =~ CFNetwork ]] || [[ $line =~ com.apple.network ]] || [[ $line =~ libsystem_info.dylib ]] || [[ $line =~ CoreFoundation ]] || [[ $line =~ userclean.xml ]];
+        if [[ $line =~ libnetwork.dylib ]] || [[ $line =~ CFNetwork ]] || [[ $line =~ com.apple.network ]] || [[ $line =~ libsystem_info.dylib ]] || [[ $line =~ CoreFoundation ]] || [[ $line =~ CFOpenDirecotry ]] || [[ $line =~ userclean.xml ]];
         then
             :
         else
@@ -216,6 +240,13 @@ if [ -f "$FINAL_OUTPUT" ]; #check if the final log actually exists. There may ha
             exit
 fi
 rm "/Library/Application Support/LANDesk/Unfiltered.log"
+
+
+
+
+
+
+
 
 
 
