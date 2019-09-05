@@ -31,6 +31,7 @@ echo -e "$Bold Gathering... $NoFormat"
 echo
 
 log show --predicate 'processImagePath contains "LANDesk"' --debug --info --last "${time}h" > "/Library/Application Support/LANDesk/Unfiltered.log"
+Unfiltered="/Library/Application Support/LANDesk/Unfiltered.log"
 
 echo -e "$GreenBold Enter one of the Following Components to filter (CASE SENSITVE): $NoFormat
      $Bold
@@ -244,6 +245,7 @@ if [ -f "$FINAL_OUTPUT" ]; #check if the final log actually exists. There may ha
             rm "$TEMP_FILE" #Delete the other files created since we have to append stuff and we don't want the same logging over again
             rm "$FINAL_OUTPUT"
             rm "$PROXY_FILE"
+            rm "$FINAL_PROXY"
         elif [[ $proxyname = "n" ]]; #do this if the user said "no" to ProxyHost
           then
             cp "$FINAL_OUTPUT" ~/Desktop #Copy file to Desktop to grab easily
@@ -253,8 +255,10 @@ if [ -f "$FINAL_OUTPUT" ]; #check if the final log actually exists. There may ha
             rm "$FINAL_OUTPUT"
         fi
     else
-        echo -e "$RedBold No Log Generated - probably wasn't anything in there for $varname $NoFormat"
-        rm "/Library/Application Support/LANDesk/Unfiltered.log"
-            exit
+        echo -e "$RedBold Looks like there wasn't anything in there for $varname. No Logs were Generated. $NoFormat"
 fi
-rm "/Library/Application Support/LANDesk/Unfiltered.log"
+
+#Clean up some stuff if it still exists somehow. Be quiet about it. 
+rm -f "$Unfiltered"
+
+rm -f "$PROXY_FILE"
