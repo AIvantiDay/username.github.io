@@ -224,7 +224,7 @@ if [ $proxyname = "y" ] && [ -f "$TEMP_FILE" ];
                 echo $line >> "$FINAL_PROXY"
                 fi
         done < "$input"
-        rm "/Library/Application Support/LANDesk/proxyhosttemp.log"
+        rm -f "/Library/Application Support/LANDesk/proxyhosttemp.log"
         echo
         echo -e "$GreenBold Done Cleaning ProxyHost Log $NoFormat"
         echo
@@ -242,17 +242,17 @@ if [ -f "$FINAL_OUTPUT" ]; #check if the final log actually exists. There may ha
             cp "/Library/Application Support/LANDesk/Unfiltered.log" ~/Desktop #Copy original unfiltered log in case comparison is needed
             echo -e "$GreenBold All Done - The requested log files "$varname.log," proxyhost.log, and the Unfiltered.log are on the Desktop $NoFormat"
             
-            rm "$TEMP_FILE" #Delete the other files created since we have to append stuff and we don't want the same logging over again
-            rm "$FINAL_OUTPUT"
-            rm "$PROXY_FILE"
-            rm "$FINAL_PROXY"
+            rm -f "$TEMP_FILE" #Delete the other files created since we have to append stuff and we don't want the same logging over again
+            rm -f "$FINAL_OUTPUT"
+            rm -f "$PROXY_FILE"
+            rm -f "$FINAL_PROXY"
         elif [[ $proxyname = "n" ]]; #do this if the user said "no" to ProxyHost
           then
             cp "$FINAL_OUTPUT" ~/Desktop #Copy file to Desktop to grab easily
             cp "/Library/Application Support/LANDesk/Unfiltered.log" ~/Desktop #Copy original unfiltered log in case comparison is needed
             echo -e "$GreenBold All Done - The requested log files "$varname.log" as well as the Unfiltered.log are on the Desktop $NoFormat"
-            rm "$TEMP_FILE" #Delete the other files created since we have to append stuff and we don't want the same logging over again
-            rm "$FINAL_OUTPUT"
+            rm -f "$TEMP_FILE" #Delete the other files created since we have to append stuff and we don't want the same logging over again
+            rm -f "$FINAL_OUTPUT"
         fi
     else
         echo -e "$RedBold Looks like there wasn't anything in there for $varname. No Logs were Generated. $NoFormat"
