@@ -131,8 +131,13 @@ while read line; do
                 :
             fi
         elif [[ $varname = "All Components" ]];
+         then
+            if [[ $line =~ proxyhost ]];
             then
+                :
+            else
             echo $line >> "$TEMP_FILE"
+            fi
         else
             echo "That's not one of the options. Please rerun the Script."  
                 exit
@@ -204,8 +209,6 @@ if [ -f "$TEMP_FILE" ];
 else
     :
 fi
-
-echo 
 
 #This loop will strip out "superflous" stuff we don't need from the ProxyHost Log (If the User said Yes)
 if [ $proxyname = "y" ] && [ -f "$TEMP_FILE" ];
