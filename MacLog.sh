@@ -148,7 +148,7 @@ done < "$input"
 if [[ $MDMEnrolled = "y" ]];
     then
         echo
-        echo -e "$GreenBold Getting MDM Logs...$NoFormat"
+        echo -e "$Bold Getting MDM Logs...$NoFormat"
         log show --predicate 'processImagePath contains "mdm"' --debug --info --last "${time}h" >> "/Library/Application Support/LANDesk/TEMP.log"
     else
     :
