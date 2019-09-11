@@ -19,7 +19,7 @@ echo
 echo -e "$GreenBold This script will gather Ivanti Agent Logging from the Apple Unified Logging Database"
 echo
 sleep 1
-echo -e " How many hours should we look back for logs? $NoFormat"
+echo -e " How many hours should we look back for logs? (1,2,3,etc.) $NoFormat"
 echo
 
 read time
@@ -33,7 +33,7 @@ echo
 log show --predicate 'processImagePath contains "LANDesk"' --debug --info --last "${time}h" > "/Library/Application Support/LANDesk/Unfiltered.log"
 Unfiltered="/Library/Application Support/LANDesk/Unfiltered.log"
 
-echo -e "$GreenBold Enter one of the Following Components to filter (CASE SENSITVE): $NoFormat
+echo -e "$GreenBold Enter one of the Following Components to filter $RedBold(CASE SENSITVE)$GreenBold: $NoFormat
      $Bold
      Patch
      Software Distribution
@@ -46,12 +46,6 @@ echo -e "$GreenBold Enter one of the Following Components to filter (CASE SENSIT
      $NoFormat"
          
 read varname
-echo
-
-#Ask the user if they want ProxyHost Traffic as well for Web Traffic Logging
-echo -e "$GreenBold Should we Filter out ProxyHost Logging too? (Web Traffic to and from Core) (y/n) $NoFormat"
-echo
-read proxyname
 echo
 
 TEMP_FILE="/Library/Application Support/LANDesk/TEMP.log"
@@ -139,7 +133,8 @@ while read line; do
             echo $line >> "$TEMP_FILE"
             fi
         else
-            echo "That's not one of the options. Please rerun the Script."  
+            echo -e "$RedBold That's not one of the options - Note that options are Case Sensitive. Please rerun the Script.$NoFormat" 
+            echo
                 exit
         fi
 done < "$input"
@@ -158,6 +153,12 @@ echo
 echo -e "$GreenBold Finished Filtering $varname Logs $NoFormat"
 echo
 sleep 1
+
+#Ask the user if they want ProxyHost Traffic as well for Web Traffic Logging
+echo -e "$GreenBold Should we Filter out ProxyHost Logging too? (Web Traffic to and from Core) (y/n) $NoFormat"
+echo
+read proxyname
+echo
 
 #Check what the user said to getting ProxyHost
 if [[ $proxyname = "y" ]];
