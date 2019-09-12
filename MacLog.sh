@@ -60,7 +60,7 @@ while read line; do
         
         if [[ $varname = "Patch" ]];
         then
-            if [[ $line =~ vulscan ]] || [[ $line =~ ldpsoftwaredist ]] || [[ $line =~ ldvdetect ]] || [[ $line =~ sdclient ]] || [[ $line =~ stmacpatch ]] || [[ $line =~ ldscriptrunner ]] || [[ $line =~ ldtmc ]] || [[ $line =~ ldvpatch ]];
+            if [[ $line =~ vulscan ]] || [[ $line =~ ldpsoftwaredist ]] || [[ $line =~ ldvdetect ]] || [[ $line =~ sdclient ]] || [[ $line =~ stmacpatch ]] || [[ $line =~ ldscriptrunner ]] || [[ $line =~ ldtmc ]] || [[ $line =~ ldvpatch ]] || [[ $line =~ ldapm ]] || [[ $line =~ ldvdownload ]];
             then 
                 echo $line >> "$TEMP_FILE"
             else 
@@ -158,7 +158,6 @@ sleep 1
 echo -e "$GreenBold Should we Filter out ProxyHost Logging too? (Web Traffic to and from Core) (y/n) $NoFormat"
 echo
 read proxyname
-echo
 
 #Check what the user said to getting ProxyHost
 if [[ $proxyname = "y" ]];
@@ -196,7 +195,7 @@ if [ -f "$TEMP_FILE" ];
         counter2=$((counter2 +1))
         PercentageDone=$((100*counter2/TotalCount))
         echo -ne " Cleaning $varname Log...$PercentageDone%"\\r
-            if [[ $line =~ libnetwork.dylib ]] || [[ $line =~ CFNetwork ]] || [[ $line =~ com.apple.network ]] || [[ $line =~ libsystem_info.dylib ]] || [[ $line =~ CoreFoundation ]] || [[ $line =~ CFOpenDirecotry ]] || [[ $line =~ userclean.xml ]];
+            if [[ $line =~ libnetwork.dylib ]] || [[ $line =~ CFNetwork ]] || [[ $line =~ com.apple.network ]] || [[ $line =~ libsystem_info.dylib ]] || [[ $line =~ CoreFoundation ]] || [[ $line =~ CFOpenDirecotry ]] || [[ $line =~ userclean.xml ]] || [[ $line =~ IVMetrics.app ]];
             then
                 :
             else
