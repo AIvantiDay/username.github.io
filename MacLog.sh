@@ -19,7 +19,7 @@ echo
 echo -e "$GreenBold This script will gather Ivanti Agent Logging from the Apple Unified Logging Database"
 echo
 sleep 1
-echo -e " How many hours should we look back for logs? (1,2,3,etc.) $NoFormat"
+echo -e " How many minutes should we look back for logs? (5,30,60,etc.) $NoFormat"
 echo
 
 read time
@@ -30,7 +30,7 @@ echo
 echo -e "$Bold Gathering... $NoFormat"
 echo
 
-log show --predicate 'processImagePath contains "LANDesk"' --debug --info --last "${time}h" > "/Library/Application Support/LANDesk/Unfiltered.log"
+log show --predicate 'processImagePath contains "LANDesk"' --debug --info --last "${time}m" > "/Library/Application Support/LANDesk/Unfiltered.log"
 Unfiltered="/Library/Application Support/LANDesk/Unfiltered.log"
 
 echo -e "$GreenBold Enter one of the Following Components to filter $RedBold(CASE SENSITVE)$GreenBold: $NoFormat
