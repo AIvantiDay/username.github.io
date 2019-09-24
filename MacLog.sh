@@ -48,6 +48,15 @@ echo -e "$GreenBold Enter one of the Following Components to filter $RedBold(CAS
 read varname
 echo
 
+if [ -f "/Library/Application Support/LANDesk/Unfiltered.log" ];
+    then
+        :
+    else
+        echo -e "$RedBold Doesn't look like any logs were generated. Is the Ivanti EPM Agent Installed?$NoFormat"
+        echo
+        exit
+fi
+
 TEMP_FILE="/Library/Application Support/LANDesk/TEMP.log"
 input="/Library/Application Support/LANDesk/Unfiltered.log"
 TotalCount=$(wc -l < "/Library/Application Support/LANDesk/Unfiltered.log")
@@ -92,7 +101,7 @@ while read line; do
             fi
         elif [[ $varname = "Provisioning" ]];
          then
-            if [[ $line =~ ldp ]];
+            if [[ ($line =~ ldp || $line =~ ivp) ]];
             then 
                 echo $line >> "$TEMP_FILE"
             else 
