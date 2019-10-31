@@ -33,7 +33,7 @@ echo
 log show --predicate 'processImagePath contains "LANDesk"' --debug --info --last "${time}m" > "/Library/Application Support/LANDesk/Unfiltered.log"
 Unfiltered="/Library/Application Support/LANDesk/Unfiltered.log"
 
-echo -e "$GreenBold Enter one of the Following Components to filter $RedBold(CASE SENSITVE)$GreenBold: $NoFormat
+echo -e "$GreenBold Enter one of the Following Components to filter $RedBold(CASE SENSITIVE)$GreenBold: $NoFormat
      $Bold
      Patch
      Software Distribution
@@ -171,12 +171,29 @@ read proxyname
 #Check what the user said to getting ProxyHost
 if [[ $proxyname = "y" ]];
     then
+        echo
         input="/Library/Application Support/LANDesk/Unfiltered.log"
         PROXY_FILE="/Library/Application Support/LANDesk/proxyhosttemp.log"
         while read line; do
             counter3=$((counter3 +1))
             PercentageDone=$((100*counter3/TotalCount))
             echo -ne "$Bold Filtering Proxyhost Logs...$PercentageDone%"\\r
+                if [[ $line =~ proxyhost ]];
+                    then 
+                        echo $line >> "$PROXY_FILE"
+                        else 
+                        :
+                fi
+        done <"$input"
+        echo
+    #We also need proxyhost traffic from System.log since stuff gets sent there sometimes
+        SystemCount=$(wc -l < "/var/log/System.log")
+        input="/var/log/system.log"
+        PROXY_FILE="/Library/Application Support/LANDesk/proxyhosttemp.log"
+        while read line; do
+            counter5=$((counter5 +1))
+            PercentageDone=$((100*counter5/SystemCount))
+            echo -ne "$Bold Getting ProxyHost Logging from System Log...$PercentageDone%"\\r
                 if [[ $line =~ proxyhost ]];
                     then 
                         echo $line >> "$PROXY_FILE"
@@ -203,7 +220,7 @@ if [ -f "$TEMP_FILE" ];
         while read line; do
         counter2=$((counter2 +1))
         PercentageDone=$((100*counter2/TotalCount))
-        echo -ne " Cleaning $varname Log...$PercentageDone%"\\r
+        echo -ne "$Bold Cleaning $varname Log...$PercentageDone%"\\r
             if [[ $line =~ libnetwork.dylib ]] || [[ $line =~ CFNetwork ]] || [[ $line =~ com.apple.network ]] || [[ $line =~ libsystem_info.dylib ]] || [[ $line =~ CoreFoundation ]] || [[ $line =~ CFOpenDirecotry ]] || [[ $line =~ userclean.xml ]] || [[ $line =~ IVMetrics.app ]];
             then
                 :
@@ -228,7 +245,7 @@ if [ $proxyname = "y" ] && [ -f "$TEMP_FILE" ];
         while read line; do
             counter4=$((counter4 +1))
             PercentageDone=$((100*counter4/TotalCount))
-            echo -ne " Cleaning ProxyHost Log...$PercentageDone%"\\r
+            echo -ne "$Bold Cleaning ProxyHost Log...$PercentageDone%"\\r
                 if [[ $line =~ libnetwork.dylib ]] || [[ $line =~ CFNetwork ]] || [[ $line =~ com.apple.network ]] || [[ $line =~ libsystem_info.dylib ]] || [[ $line =~ CoreFoundation ]] || [[ $line =~ userclean.xml ]];
                 then
                     :
